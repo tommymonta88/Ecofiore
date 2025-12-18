@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoFioriere - Fioriere artigianali in legno riciclato</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    background-color: #f7f5f0;
+    color: #3b2f1e;
+  }
+
+  /* --- MENU --- */
+  .menu-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    cursor: pointer;
+    z-index: 3;
+  }
+  .menu-btn div {
+    width: 30px;
+    height: 4px;
+    background-color: #3b2f1e;
+    margin: 6px 0;
+    transition: 0.4s;
+  }
+  .menu {
+    height: 100vh;
+    width: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #3b2f1e;
+    overflow-x: hidden;
+    transition: 0.4s;
+    padding-top: 60px;
+    z-index: 2;
+  }
+  .menu a {
+    padding: 10px 30px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #fff;
+    display: block;
+    transition: 0.3s;
+  }
+  .menu a:hover {
+    background-color: #6a4f33;
+  }
+  .menu.open { width: 220px; }
+  .menu-btn.change .bar1 { transform: rotate(-45deg) translate(-6px, 6px); }
+  .menu-btn.change .bar2 { opacity: 0; }
+  .menu-btn.change .bar3 { transform: rotate(45deg) translate(-6px, -6px); }
+
+  /* --- SEZIONI --- */
+  section { display: none; padding: 100px 40px 40px; transition: opacity 0.5s ease-in-out; }
+  section.active { display: block; }
+
+  /* --- HERO --- */
+  .hero { text-align: center; padding: 100px 20px; background: linear-gradient(to right, #7a5230, #b88b5e); color: white; }
+  .hero span { color: #caffbf; }
+  .cta { background-color: #caffbf; color: #3b2f1e; padding: 12px 25px; border: none; cursor: pointer; font-weight: bold; border-radius: 8px; margin-top: 10px; }
+  .cta:hover { background-color: #b5f0a5; }
+
+  /* --- GALLERY --- */
+  .gallery { display: flex; justify-content: center; gap: 20px; padding: 40px; flex-wrap: wrap; }
+  .gallery img { width: 300px; border-radius: 10px; box-shadow: 0 3px 6px rgba(0,0,0,0.2); transition: transform 0.3s; }
+  .gallery img:hover { transform: scale(1.05); }
+
+  /* --- PRODOTTI --- */
+  .prodotti { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+  .card { background-color: #fffdf8; border-radius: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.2); width: 280px; padding: 20px; text-align: center; }
+  .card img { width: 100%; border-radius: 10px; margin-bottom: 10px; }
+  .card h3 { margin: 10px 0 5px; color: #3b2f1e; }
+  .card p { font-size: 15px; color: #4d3b24; }
+  .prezzo { font-weight: bold; color: #2d6a4f; margin-top: 10px; }
+  .card button { margin-top: 10px; background-color: #7a5230; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+  .card button:hover { background-color: #5a3d21; }
+
+  /* --- CONFIGURATORE --- */
+  .configuratore { margin-top: 15px; background-color: #f5f2ec; padding: 15px; border-radius: 8px; text-align: left; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  .configuratore label { display: block; margin: 8px 0 4px; font-weight: bold; }
+  .configuratore select { padding: 6px; width: 100%; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
+  .configuratore button { background-color: #7a5230; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+  .configuratore button:hover { background-color: #5a3d21; }
+  .risultato { margin-top: 10px; font-weight: bold; color: #2d6a4f; }
+
+  /* --- CONTATTI --- */
+  .contatti-box { background-color: #fffdf8; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
+  iframe { border: 0; width: 100%; height: 300px; border-radius: 8px; }
+
+  /* --- CHECKOUT --- */
+  .checkout-box { background-color: #fffdf8; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  table, th, td { border: 1px solid #ccc; }
+  th, td { padding: 8px; text-align: left; }
+  .totale { text-align: right; font-weight: bold; margin-top: 10px; }
+
+  /* --- CARRELLO ICONA --- */
+  .carrello-icon { position: fixed; top: 20px; right: 20px; cursor: pointer; font-size: 22px; background-color: #2d6a4f; color: white; padding: 10px 12px; border-radius: 50%; z-index: 4; }
+  .totArt { margin-left: 5px; }
+  @keyframes scaleUp { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
+  .animato { animation: scaleUp 0.3s ease-in-out; }
+  footer { text-align: center; padding: 20px; background-color: #3b2f1e; color: white; margin-top: 40px; }
+
+  @media (max-width: 600px) {
+    .prodotti { flex-direction: column; align-items: center; }
+    .gallery img { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Menu Hamburger -->
+<div class="menu-btn" id="menuBtn">
+  <div class="bar1"></div>
+  <div class="bar2"></div>
+  <div class="bar3"></div>
+</div>
+
+<!-- Menu -->
+<div class="menu" id="menu">
+  <a href="#" onclick="showSection('home')">Home</a>
+  <a href="#" onclick="showSection('prodotti')">Prodotti</a>
+  <a href="#" onclick="showSection('sostenibile')">Sostenibile</a>
+  <a href="#" onclick="showSection('contatti')">Contatti</a>
+</div>
+
+<!-- Carrello Icona -->
+<div class="carrello-icon">🛒<span id="totArticoli" class="totArt">0</span></div>
+
+<!-- HOME -->
+<section id="home" class="active">
+  <div class="hero">
+    <h1>Benvenuto su <span>EcoFioriere</span></h1>
+    <p>Fioriere artigianali in legno riciclato, fatte a mano in Italia 🌱</p>
+    <button class="cta" onclick="showSection('prodotti')">Scopri i nostri prodotti</button>
+  </div>
+  <div class="gallery">
+    <img src="https://picsum.photos/400/250?random=21" alt="Fioriera">
+    <img src="https://picsum.photos/400/250?random=22" alt="Fioriera">
+    <img src="https://picsum.photos/400/250?random=23" alt="Fioriera">
+  </div>
+  <footer>
+    <p>© 2025 EcoFioriere - Artigianato sostenibile</p>
+  </footer>
+</section>
+
+<!-- PRODOTTI -->
+<section id="prodotti">
+  <h1>Le nostre Fioriere</h1>
+  <div class="prodotti">
+    <div class="card">
+      <img src="https://picsum.photos/300/200?random=24" alt="Fioriera Classica">
+      <h3>Fioriera Classica</h3>
+      <p>Design semplice e rustico. Ideale per giardini e balconi tradizionali.</p>
+      <p><strong>Materiale sostenibile:</strong> legno 100% riciclato 🌱</p>
+      <div class="prezzo">€20,00</div>
+      <button onclick="aggiungiAlCarrello(20,'Fioriera Classica')">Aggiungi al Carrello</button>
+    </div>
+    <div class="card">
+      <img src="https://picsum.photos/300/200?random=25" alt="Fioriera Moderna">
+      <h3>Fioriera Moderna</h3>
+      <p>Design minimalista, perfetta per spazi contemporanei.</p>
+      <div class="prezzo">€35,00</div>
+      <button onclick="aggiungiAlCarrello(35,'Fioriera Moderna')">Aggiungi al Carrello</button>
+    </div>
+    <div class="card">
+      <img src="https://picsum.photos/300/200?random=26" alt="Fioriera Grande">
+      <h3>Fioriera Grande</h3>
+      <p>Capiente, perfetta per alberi piccoli o composizioni di piante.</p>
+      <div class="prezzo">€50,00</div>
+      <button onclick="aggiungiAlCarrello(50,'Fioriera Grande')">Aggiungi al Carrello</button>
+    </div>
+
+    <!-- Configuratore -->
+    <div class="card">
+      <h3>Fioriera Personalizzata</h3>
+      <div class="configuratore">
+        <label for="dimFioriera">Dimensione</label>
+        <select id="dimFioriera">
+          <option value="20.00">Piccola (€20,00)</option>
+          <option value="35.00">Media (€35,00)</option>
+          <option value="50.00">Grande (€50,00)</option>
+        </select>
+        <label for="coloreFioriera">Colore</label>
+        <select id="coloreFioriera">
+          <option value="Naturale">Naturale</option>
+          <option value="Marrone">Marrone</option>
+          <option value="Grigio">Grigio</option>
+        </select>
+        <button onclick="aggiungiFiorieraPersonalizzata()">Aggiungi Personalizzata</button>
+        <div class="risultato" id="risultatoConfig"></div>
+      </div>
+    </div>
+  </div>
+  <button class="cta" onclick="showSection('checkout')">Vai al Checkout</button>
+</section>
+
+<!-- SOSTENIBILE -->
+<section id="sostenibile">
+  <h1>Sostenibilità</h1>
+  <p>Tutti i nostri prodotti sono realizzati con legno riciclato e vernici naturali. Riduciamo l'impatto ambientale e supportiamo l'artigianato locale.</p>
+</section>
+
+<!-- CONTATTI -->
+<section id="contatti">
+  <h1>Contatti</h1>
+  <div class="contatti-box">
+    <p>Email: info@ecofioriere.it</p>
+    <p>Telefono: 123-4567890</p>
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3023.843775903344!2d12.4963653153153!3d41.90278397921914!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x132f61aa0321a567%3A0x9d452a5c0c1f!2sRoma!5e0!3m2!1sit!2sit!4v1615379246953!5m2!1sit!2sit" allowfullscreen="" loading="lazy"></iframe>
+  </div>
+</section>
+
+<!-- CHECKOUT -->
+<section id="checkout">
+  <h1>Il tuo Carrello</h1>
+  <div class="checkout-box">
+    <table>
+      <thead>
+        <tr>
+          <th>Prodotto</th>
+          <th>Prezzo</th>
+          <th>Azione</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyCarrello"></tbody>
+    </table>
+    <div class="totale" id="totaleCarrello">Totale: €0,00</div>
+    <button class="cta" onclick="confermaAcquisto()">Conferma Acquisto</button>
+  </div>
+</section>
+
+<script>
+  // MENU
+  const menuBtn = document.getElementById('menuBtn');
+  const menu = document.getElementById('menu');
+  menuBtn.onclick = function() {
+    menuBtn.classList.toggle('change');
+    menu.classList.toggle('open');
+  }
+
+  // SEZIONI
+  function showSection(id){
+    document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    menu.classList.remove('open');
+    menuBtn.classList.remove('change');
+  }
+
+  // CARRELLO
+  let carrello = [];
+
+  function aggiornaCarrello(){
+    const tbody = document.getElementById('tbodyCarrello');
+    tbody.innerHTML = '';
+    let totale = 0;
+    carrello.forEach((item,index) => {
+      totale += item.prezzo;
+      tbody.innerHTML += `<tr>
+        <td>${item.nome}</td>
+        <td>€${item.prezzo.toFixed(2)}</td>
+        <td><button onclick="rimuoviDalCarrello(${index})">Rimuovi</button></td>
+      </tr>`;
+    });
+    document.getElementById('totaleCarrello').innerText = `Totale: €${totale.toFixed(2)}`;
+    const totArt = document.getElementById('totArticoli');
+    totArt.innerText = carrello.length;
+    totArt.classList.add('animato');
+    setTimeout(()=>totArt.classList.remove('animato'),300);
+  }
+
+  function aggiungiAlCarrello(prezzo,nome){
+    carrello.push({prezzo,nome});
+    aggiornaCarrello();
+  }
+
+  function rimuoviDalCarrello(index){
+    carrello.splice(index,1);
+    aggiornaCarrello();
+  }
+
+  function aggiungiFiorieraPersonalizzata(){
+    const dimSelect = document.getElementById('dimFioriera');
+    const colSelect = document.getElementById('coloreFioriera');
+    const prezzo = parseFloat(dimSelect.value);
+    const nome = `Fioriera ${dimSelect.options[dimSelect.selectedIndex].text} - ${colSelect.value}`;
+    aggiungiAlCarrello(prezzo,nome);
+    document.getElementById('risultatoConfig').innerText = `${nome} aggiunta al carrello!`;
+  }
+
+  function confermaAcquisto(){
+    if(carrello.length === 0){ alert("Il carrello è vuoto!"); return; }
+    alert("Grazie per l'acquisto! Il totale è €" + carrello.reduce((a,b)=>a+b.prezzo,0).toFixed(2));
+    carrello = [];
+    aggiornaCarrello();
+    showSection('home');
+  }
+</script>
+
+</body>
+</html>
+
+
+     
+
+
+
+
+
+
+
+
+
